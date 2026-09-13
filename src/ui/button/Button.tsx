@@ -2,6 +2,7 @@ import { Text } from 'src/ui/text';
 
 import styles from './Button.module.scss';
 import { clsx } from 'clsx';
+import React from 'react';
 
 export const Button = ({
 	title,
@@ -10,7 +11,7 @@ export const Button = ({
 	type,
 }: {
 	title: string;
-	onClick?: () => void;
+	onClick?: (e: React.FormEvent) => void;
 	htmlType?: React.ButtonHTMLAttributes<HTMLButtonElement>['type'];
 	type: 'apply' | 'clear';
 }) => {
