@@ -18,35 +18,35 @@ import {
 
 import styles from './ArticleParamsForm.module.scss';
 interface ArticleParamsFormProps {
-	initialValues?: ArticleStateType;
 	onApply: (state: ArticleStateType) => void;
 	onReset: () => void;
 }
 
 export const ArticleParamsForm = ({
-	initialValues = defaultArticleState,
 	onApply,
 	onReset,
 }: ArticleParamsFormProps) => {
-	const [isOpen, setIsOpen] = useState(false);
-	const [draft, setDraft] = useState(initialValues);
+	const [isFormOpen, setIsOpen] = useState(false);
+	const [draft, setDraft] = useState(defaultArticleState);
 
-	const containerRef = useRef<HTMLElement | null>(null);
+	const containerRef = useRef<HTMLDivElement | null>(null);
+
 	useEffect(() => {
-		if (!isOpen) {
+		if (!isFormOpen) {
 			return;
 		}
-		const handleClikOutside = (e: MouseEvent) => {
-			const target = e.target as Node;
+		const handleClickOutside = (e: MouseEvent) => {
+			const target = e.target as Element;
+
 			if (containerRef.current && !containerRef.current.contains(target)) {
 				setIsOpen(false);
 			}
 		};
-		document.addEventListener('mousedown', handleClikOutside);
+		document.addEventListener('mousedown', handleClickOutside);
 		return () => {
-			document.removeEventListener('mousedown', handleClikOutside);
+			document.removeEventListener('mousedown', handleClickOutside);
 		};
-	}, [isOpen]);
+	}, [isFormOpen]);
 	const updateField = <K extends keyof ArticleStateType>(
 		key: K,
 		newValue: ArticleStateType[K]
@@ -61,81 +61,77 @@ export const ArticleParamsForm = ({
 	const handleReset = (e: React.FormEvent) => {
 		e.preventDefault();
 		onReset();
-		setDraft(initialValues);
+		setDraft(defaultArticleState);
 	};
 	return (
 		<>
-			<ArrowButton
-				isOpen={isOpen}
-				onClick={() => {
-					setIsOpen(!isOpen);
-				}}
-			/>
-			<aside
-				className={clsx(styles.container, { [styles.container_open]: isOpen })}
-				ref={containerRef}>
-				<form className={styles.form}>
-					<Text as={'h2'} size={31} weight={800} uppercase={true}>
-						Задайте параметры
-					</Text>
-					<Select
-						title='шрифт'
-						options={fontFamilyOptions}
-						selected={draft.fontFamilyOption}
-						onChange={(selected) => {
-							updateField('fontFamilyOption', selected);
-						}}
-					/>
-					<RadioGroup
-						title='рАЗМЕР шрифта'
-						name='fontSize'
-						options={fontSizeOptions}
-						selected={draft.fontSizeOption}
-						onChange={(value) => {
-							updateField('fontSizeOption', value);
-						}}
-					/>
-					<Select
-						title='Цвет шрифта'
-						options={fontColors}
-						selected={draft.fontColor}
-						onChange={(selected) => {
-							updateField('fontColor', selected);
-						}}
-					/>
-					<Separator />
-					<Select
-						title='Цвет фона'
-						options={backgroundColors}
-						selected={draft.backgroundColor}
-						onChange={(selected) => {
-							updateField('backgroundColor', selected);
-						}}
-					/>
-					<Select
-						title='Ширина контента'
-						options={contentWidthArr}
-						selected={draft.contentWidth}
-						onChange={(selected) => {
-							updateField('contentWidth', selected);
-						}}
-					/>
-					<div className={styles.bottomContainer}>
-						<Button
-							title='Сбросить'
-							htmlType='reset'
-							type='clear'
-							onClick={handleReset}
+			<div ref={containerRef}>
+				<ArrowButton
+					isOpen={isFormOpen}
+					onClick={() => {
+						setIsOpen(!isFormOpen);
+					}}
+				/>
+				<aside
+					className={clsx(styles.container, {
+						[styles.container_open]: isFormOpen,
+					})}>
+					<form
+						className={styles.form}
+						onSubmit={handleApply}
+						onReset={handleReset}>
+						<Text as={'h2'} size={31} weight={800} uppercase={true}>
+							Задайте параметры
+						</Text>
+						<Select
+							title='шрифт'
+							options={fontFamilyOptions}
+							selected={draft.fontFamilyOption}
+							onChange={(selected) => {
+								updateField('fontFamilyOption', selected);
+							}}
 						/>
-						<Button
-							title='Применить'
-							htmlType='submit'
-							type='apply'
-							onClick={handleApply}
+						<RadioGroup
+							title='размер шрифта'
+							name='fontSize'
+							options={fontSizeOptions}
+							selected={draft.fontSizeOption}
+							onChange={(value) => {
+								updateField('fontSizeOption', value);
+							}}
 						/>
-					</div>
-				</form>
-			</aside>
+						<Select
+							title='Цвет шрифта'
+							options={fontColors}
+							selected={draft.fontColor}
+							onChange={(selected) => {
+								updateField('fontColor', selected);
+							}}
+						/>
+						<Separator />
+						<Select
+							title='Цвет фона'
+							options={backgroundColors}
+							selected={draft.backgroundColor}
+							onChange={(selected) => {
+								updateField('backgroundColor', selected);
+							}}
+						/>
+						<Select
+							title='Ширина контента'
+							options={contentWidthArr}
+							selected={draft.contentWidth}
+							onChange={(selected) => {
+								updateField('contentWidth', selected);
+							}}
+						/>
+						<div className={styles.bottomContainer}>
+							<Button title='Сбросить' htmlType='reset' type='clear' />
+							<Button title='Применить' htmlType='submit' type='apply' />
+						</div>
+					</form>
+				</aside>
+			</div>
 		</>
 	);
 };
