@@ -2,6 +2,7 @@ import { Text } from 'src/ui/text';
 
 import styles from './Button.module.scss';
 import { clsx } from 'clsx';
+import React from 'react';
 
 export const Button = ({
 	title,
